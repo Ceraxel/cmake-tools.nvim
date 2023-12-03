@@ -45,7 +45,7 @@ function cmake.setup(values)
   config = Config:new(const)
 
   -- auto reload previous session
-  if cmake.is_cmake_project() then
+  if cmake.is_cmake_project() and vim.loop.cwd() == initial_cwd then
     local old_config = _session.load()
     if next(old_config) ~= nil then
       if old_config.build_directory then
