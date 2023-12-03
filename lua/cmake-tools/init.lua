@@ -20,6 +20,7 @@ local config = Config:new(const)
 local cmake = {}
 
 local full_cmd = ""
+local initial_cwd = vim.loop.cwd()
 
 --- Setup cmake-tools
 function cmake.setup(values)
@@ -1525,6 +1526,7 @@ if cmake.is_cmake_project() then
   vim.api.nvim_create_autocmd("VimLeavePre", {
     group = group,
     callback = function()
+      config.cwd = initial_cwd
       _session.save(config)
     end,
   })
