@@ -1526,8 +1526,9 @@ if cmake.is_cmake_project() then
   vim.api.nvim_create_autocmd("VimLeavePre", {
     group = group,
     callback = function()
-      config.cwd = initial_cwd
-      _session.save(config)
+      if config.cwd == initial_cwd then
+        _session.save(config)
+      end
     end,
   })
 end
