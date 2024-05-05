@@ -492,6 +492,10 @@ function _terminal.prepare_cmd_for_run(cmd, env, args, cwd)
     full_cmd = " " .. full_cmd -- adding a space in front of the command prevents bash from recording the command in the history (if configured)
   end
 
+  if osys.islinux or osys.iswsl or osys.ismac then
+    full_cmd = "clear && " .. full_cmd -- adding a space in front of the command prevents bash from recording the command in the history (if configured)
+  end
+
   -- Add args to the cmd
   for _, arg in ipairs(args) do
     full_cmd = full_cmd .. " " .. arg
