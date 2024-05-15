@@ -152,7 +152,7 @@ function _terminal.send_data_to_terminal(buffer_idx, cmd, opts)
     elseif osys.ismac then
       cmd = cmd .. " \n"
     elseif osys.islinux then
-      cmd = cmd .. " \n"
+      cmd = "clear \r\n " .. cmd .. " \n"
     elseif osys.iswsl then
       --NOTE: Techinically, wsl-2 and linux are detected as linux. We might see a diferrence in wsl-1 vs wsl-2
       cmd = cmd .. " \n"
@@ -492,10 +492,6 @@ function _terminal.prepare_cmd_for_run(cmd, env, args, cwd)
     full_cmd = " " .. full_cmd -- adding a space in front of the command prevents bash from recording the command in the history (if configured)
   end
 
-  if osys.islinux or osys.iswsl or osys.ismac then
-    full_cmd = "clear && " .. full_cmd -- adding a space in front of the command prevents bash from recording the command in the history (if configured)
-  end
-
   -- Add args to the cmd
   for _, arg in ipairs(args) do
     full_cmd = full_cmd .. " " .. arg
@@ -621,20 +617,15 @@ function _terminal.run(cmd, env_script, env, args, cwd, opts, on_exit, on_output
   end
 
   -- Send final cmd to terminal
-  local chain_symb = osys.iswin32 and " & " or " ; "
-  _terminal.send_data_to_terminal(
-    buffer_idx,
-    full_cmd .. chain_symb .. get_command_handling_on_exit(),
-    {
-      win_id = final_win_id,
-      prefix = opts.prefix_name,
-      split_direction = opts.split_direction,
-      split_size = opts.split_size,
-      start_insert = opts.start_insert,
-      focus = opts.focus,
-      do_not_add_newline = opts.do_not_add_newline,
-    }
-  )
+  _terminal.send_data_to_terminal(buffer_idx, full_cmd, {
+    win_id = final_win_id,
+    prefix = opts.prefix_name,
+    split_direction = opts.split_direction,
+    split_size = opts.split_size,
+    start_insert = opts.start_insert,
+    focus = opts.focus,
+    do_not_add_newline = opts.do_not_add_newline,
+  })
   on_exit_coroutine = coroutine.create(function()
     while utils.file_exists(get_lock_file_path()) do
       vim.defer_fn(function()
